@@ -16,7 +16,7 @@ LICENSE_PLATE_CLASS_ID = 0
 
 def load_yolo_v8_model():
     start_time = time.time()  
-    model_path = current_dir / 'yolo' / 'best.pt'
+    model_path = current_dir / 'yolo' / 'last.pt'
     if not model_path.exists():
         print(f"Model file does not exist at {model_path}")
         return None
