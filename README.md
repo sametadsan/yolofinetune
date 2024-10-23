@@ -13,3 +13,11 @@ ssl-error : pip install --trusted-host pypi.org --trusted-host pypi.python.org -
 run : python yolo_license_plate.py
 
 run in background : Start-Process -NoNewWindow -FilePath "python" -ArgumentList "C:\path\to\your\application\yolo_license_plate.py"
+
+create packages : pip download -r requirements.txt -d packages
+
+create packages ssl error : pip download --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org -r requirements.txt -d packages
+
+packages in run command : pip install --no-index --find-links=packages -r requirements.txt
+
+control : pip list
