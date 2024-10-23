@@ -20,4 +20,19 @@ create packages ssl error : pip download --trusted-host pypi.org --trusted-host 
 
 packages in run command : pip install --no-index --find-links=packages -r requirements.txt
 
-control : pip list
+PM2
+npm install pm2
+
+start app services : pm2 start ecosystem.config.js
+
+status : pm2 status
+
+changed ecosytem config : pm2 reload ecosystem.config.js
+
+log : pm2 logs
+
+detail : pm2 show YolofinetuneFlaskService
+
+stop : pm2 stop YolofinetuneFlaskService
+
+restart : pm2 restart YolofinetuneFlaskService

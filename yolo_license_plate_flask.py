@@ -105,4 +105,4 @@ def upload_files():
 if __name__ == "__main__":
     model = load_yolo_v8_model()
     if model:
-        app.run(debug=True)
+        app.run(host='127.0.0.1', port=5001, debug=False)
