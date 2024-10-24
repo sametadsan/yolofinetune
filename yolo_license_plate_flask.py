@@ -41,11 +41,11 @@ def detect_license_plates_yolo_v8(image, model, confidence_threshold=0.2):
     print(f"License plate detection time: {end_time - start_time:.4f} seconds") 
     return detections
 
-def add_watermark(image, text="sompo sigorta", opacity=0.5):
+def add_watermark(image, text="Sompo Sigorta A.S.", opacity=0.5):
     start_time = time.time()  # Start timing
     overlay = image.copy()
     font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 2
+    font_scale = 1.5
     font_color = (255, 255, 255)  
     font_thickness = 3
     text_size = cv2.getTextSize(text, font, font_scale, font_thickness)[0]
