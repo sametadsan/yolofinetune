@@ -7,22 +7,21 @@ from flask import Flask, request, jsonify, send_file
 from io import BytesIO
 import numpy as np
 
-
 app = Flask(__name__)
 
 current_dir = Path(__file__).resolve().parent
 output_dir = current_dir / 'output'
 output_dir.mkdir(exist_ok=True)
 
-LICENSE_PLATE_CLASS_ID = 0  
+LICENSE_PLATE_CLASS_ID = 0
 
-def load_yolo_v8_model():
+def load_yolo_v8_model(model_name='last.pt'):
     start_time = time.time()  
-    model_path = current_dir / 'yolo' / 'last.pt'
+    model_path = current_dir / 'yolo' / model_name
     if not model_path.exists():
         print(f"Model file does not exist at {model_path}")
         return None
-    model = YOLO(str(model_path))  # Convert Path object to string
+    model = YOLO(str(model_path)) 
     print("YOLOv8 model loaded successfully")
     end_time = time.time()  
     print(f"Model loading time: {end_time - start_time:.4f} seconds")  
@@ -84,13 +83,18 @@ def cover_license_plate_with_black(image, model, debug=False):
 
 @app.route('/upload', methods=['POST'])
 def upload_files():
-    files = request.files.getlist("files")  
-
+    files = request.files.getlist("files")
+    model_name = request.args.get('model_name', 'last.pt') # default last model
+   
     if files and files[0].filename:
         in_memory_file = BytesIO()
         files[0].save(in_memory_file)
         in_memory_file.seek(0)
         image = cv2.imdecode(np.frombuffer(in_memory_file.read(), np.uint8), cv2.IMREAD_COLOR)
+
+        model = load_yolo_v8_model(model_name)
+        if not model:
+            return f"Model {model_name} not found.", 404
 
         processed_image = cover_license_plate_with_black(image, model, debug=True)
 
@@ -103,6 +107,4 @@ def upload_files():
         return "No file uploaded", 400
 
 if __name__ == "__main__":
-    model = load_yolo_v8_model()
-    if model:
-        app.run(host='127.0.0.1', port=5001, debug=False)
+    app.run(host='127.0.0.1', port=5001, debug=False)

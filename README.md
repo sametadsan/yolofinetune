@@ -39,8 +39,13 @@ restart : pm2 restart YolofinetuneFlaskService
 
 startup :
 pm2 start ecosystem.config.js
+
 pm2 start
+
 npm install pm2-windows-startup -g
+
 pm2 install pm2-windows-service
+
 pm2-startup install
+
 pm2 save
