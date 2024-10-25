@@ -26,6 +26,7 @@ def load_yolo_v8_model(model_name='last.pt'):
     end_time = time.time()  
     print(f"Model loading time: {end_time - start_time:.4f} seconds")  
     return model
+    
 
 def detect_license_plates_yolo_v8(image, model, confidence_threshold=0.2):
     start_time = time.time()  #  timing
@@ -58,28 +59,90 @@ def add_watermark(image, text="Sompo Sigorta A.S.", opacity=0.5):
     print(f"Watermark addition time: {end_time - start_time:.4f} seconds")  
     return image
 
-def cover_license_plate_with_black(image, model, debug=False):
-    start_time = time.time()  # timing
-    detections = detect_license_plates_yolo_v8(image, model)
+    start_time = time.time()  
+    original_image = image.copy()  
+    angles = [0, 90, 180, 270]  
+    processed = False
 
-    if not detections:
-        print(f"No license plates detected.")
+    for angle in angles:
+        rotated_image = rotate_image(image, angle)
+        detections = detect_license_plates_yolo_v8(rotated_image, model)
+
+        if detections:
+            if debug:
+                for (box, confidence) in detections:
+                    x, y, w, h = box
+                    cv2.rectangle(rotated_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+            for (box, confidence) in detections:
+                x, y, w, h = box
+                cv2.rectangle(rotated_image, (x, y), (x + w, y + h), (0, 0, 0), -1)
+
+            image = rotate_image(rotated_image, -angle)
+            processed = True
+            break
+
+    if not processed:
         image = add_watermark(image)
-        return image
+    else:
+        image = add_watermark(image)
 
-    if debug:
-        for (box, confidence) in detections:
-            x, y, w, h = box
-            cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-    for (box, confidence) in detections:
-        x, y, w, h = box
-        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 0), -1)
-
-    image = add_watermark(image)
     end_time = time.time()  # End timing
     print(f"Total processing time for this image: {end_time - start_time:.4f} seconds")
     return image
+
+def cover_license_plate_with_black(image, model, debug=False):
+    start_time = time.time()  
+    angles = [0, 90, 180, 270]  
+    original_image = image.copy()  
+    image_height, image_width = image.shape[:2]
+
+    
+    mask = np.zeros((image_height, image_width), dtype=np.uint8)
+
+    for angle in angles:
+        
+        rotated_image = rotate_image(original_image, angle)
+        detections = detect_license_plates_yolo_v8(rotated_image, model)
+
+        if detections:
+            for (box, confidence) in detections:
+                x, y, w, h = box
+
+                
+                if angle == 90:
+                    x, y = y, image_height - x - w
+                    w, h = h, w
+                elif angle == 180:
+                    x, y = image_width - x - w, image_height - y - h
+                elif angle == 270:
+                    x, y = image_width - y - h, x
+                    w, h = h, w
+
+                
+                cv2.rectangle(mask, (x, y), (x + w, y + h), 255, -1)
+
+    
+    original_image[mask == 255] = [0, 0, 0]
+
+    
+    original_image = add_watermark(original_image)
+    
+    end_time = time.time()  
+    print(f"Total processing time for this image: {end_time - start_time:.4f} seconds")
+    return original_image
+
+def rotate_image(image, angle):
+    if angle == 0:
+        return image.copy()
+    elif angle == 90:
+        return cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+    elif angle == 180:
+        return cv2.rotate(image, cv2.ROTATE_180)
+    elif angle == 270:
+        return cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+
 
 @app.route('/upload', methods=['POST'])
 def upload_files():
