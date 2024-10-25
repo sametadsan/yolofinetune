@@ -144,7 +144,7 @@ def rotate_image(image, angle):
 
 
 
-@app.route('/upload', methods=['POST'])
+@app.route('/license-plate/upload', methods=['POST'])
 def upload_files():
     files = request.files.getlist("files")
     model_name = request.args.get('model_name', 'last.pt') # default last model
@@ -169,5 +169,8 @@ def upload_files():
     else:
         return "No file uploaded", 400
 
+def main():
+    app.run(port=5001, debug=False)
+
 if __name__ == "__main__":
-    app.run(host='127.0.0.1', port=5001, debug=False)
+    main()

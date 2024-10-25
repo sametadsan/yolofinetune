@@ -1,0 +1,1 @@
+from .yolo_license_plate_flask import app, main

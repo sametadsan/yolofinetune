@@ -49,3 +49,20 @@ pm2 install pm2-windows-service
 pm2-startup install
 
 pm2 save
+
+production:
+
+python setup.py sdist bdist_wheel
+
+/dist -> pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org yolofinetune-0.1.tar.gz
+
+pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org yolofinetune-0.1-py3-none-any.whl
+
+yolofinetune.exe created
+
+pm2 start : pm2 start yolofinetune.exe --name yolofinetune
+
+startup ->
+pm2-startup install
+
+pm2 save

@@ -1,1 +1,1 @@
-yolov8n.pt : https://www.kaggle.com/code/sauravdb/object-detection-yolo-ocr/notebook
+human_detect.pt : https://www.kaggle.com/code/sauravdb/object-detection-yolo-ocr/notebook
